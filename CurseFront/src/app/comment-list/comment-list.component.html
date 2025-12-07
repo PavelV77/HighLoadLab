@@ -1,0 +1,13 @@
+<div class="container-fluid">
+    <div class="bg-dark text-secondary px-2 py-2 my-3 text-center container-fluid "
+        style="border-radius: 10px">
+        <button type="button" class="btn btn-warning me-10" [routerLink]="['/news/' + newsId +'/comments/new']">Оставить комментарий</button>
+    </div>
+<div class="container-fluid">
+    <ul class="list-group">
+        <li class="list-group-item" *ngFor="let comment of commentList">
+            <app-comment-show (editEvent)="edit($event)" (deleteEvent)="delete($event)" [comment]="comment"  ></app-comment-show>
+        </li>
+    </ul>
+</div>
+</div>

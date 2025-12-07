@@ -1,0 +1,8 @@
+<div class="bg-dark text-secondary px-4 py-5 my-5 container-fluid " style="width:50%; border-radius: 10px">
+    <div style="align-items: center;">
+        <label class="fs-5 mb-4 my-1 text-white text-align">Логин</label>
+        <input class="form-control justify-content-sm-center" type="text" id="name" name="name" [(ngModel)]="user.login" style="width:50%;" />
+    </div>
+    <br>
+    <button type="button" class="btn btn-outline-light btn-lg px-4" (click)="save()">Сохранить</button>
+</div>

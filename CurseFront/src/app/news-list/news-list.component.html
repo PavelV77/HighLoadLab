@@ -1,0 +1,14 @@
+<div class="container-fluid">
+    <div class="bg-dark text-secondary px-2 py-2 my-3 text-center container-fluid "
+        style="border-radius: 10px">
+        <button type="button" class="btn btn-warning me-10" [routerLink]="['/news/new']">Создать новую новость</button>
+    </div>
+<div class="container-fluid">
+    <ul class="list-group">
+        <li class="list-group-item" *ngFor="let news of newsList">
+            <app-news-shower [news]="news" (likeEvent)="like($event)" (dislikeEvent)="dislike($event)"
+                (editEvent)="edit($event)" (deleteEvent)="delete($event)" (commentEvent)="comment($event)"></app-news-shower>
+        </li>
+    </ul>
+</div>
+</div>

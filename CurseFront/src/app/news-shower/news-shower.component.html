@@ -1,0 +1,22 @@
+<section>
+    <div class="bg-dark text-secondary px-4 py-5 text-right" style="border-radius: 10px; text-align: right;">
+        <button type="button" class="btn btn-outline-right btn-lg px-4"
+            style="width: 32px;height: 32px; background: url('https://i.stack.imgur.com/cLnMQ.png') no-repeat center center;"
+            (click)="delete()"></button>
+        <div class="bg-dark text-secondary px-4 py-5 text-center" style="border-radius: 10px;">
+            <div>
+                <h1 class="display-5 fw-bold text-white">{{news.head}}</h1>
+                <p class="fs-5 mb-4 my-4 text-white">{{news.body}}</p>
+                <p>Дата публикации: {{news.insertAt|date}}</p>
+            </div>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <button type="button" class="btn btn-outline-light btn-lg px-4" (click)="like()">Лайк
+                    {{news.countLike}}</button>
+                <button type="button" class="btn btn-outline-light btn-lg px-4" (click)="disLike()">Дизлайк:
+                    {{news.countDislike}}</button>
+                <button type="button" class="btn btn-outline-light btn-lg px-4" (click)="edit()">Редактировать</button>
+                <button type="button" class="btn btn-outline-light btn-lg px-4" (click)="comment()">Комментарии</button>
+            </div>
+        </div>
+    </div>
+</section>

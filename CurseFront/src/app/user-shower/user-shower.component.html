@@ -1,0 +1,17 @@
+<section>
+    <div class="bg-dark text-secondary px-4 py-5 text-right" style="border-radius: 10px; text-align: right;">
+        <button type="button" class="btn btn-outline-right btn-lg px-4"
+            style="width: 32px;height: 32px; background: url('https://i.stack.imgur.com/cLnMQ.png') no-repeat center center;"
+            (click)="delete()"></button>
+        <div class="bg-dark text-secondary px-4 py-5 text-center" style="border-radius: 10px;">
+            <div>
+                <h1 class="display-5 fw-bold text-white">{{user.login}}</h1>
+                <p class="fs-5 mb-4 my-4 text-white">{{user.insertAt|date}}</p>
+                <p>Дата изменения: {{user.updateAt|date}}</p>
+            </div>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <button type="button" class="btn btn-outline-light btn-lg px-4" (click)="update()">Редактировать</button>
+            </div>
+        </div>
+    </div>
+</section>
