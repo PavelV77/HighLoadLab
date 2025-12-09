@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NewsShowerComponent } from './news-shower/news-shower.component';
 import { NewsListComponent } from './news-list/news-list.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { UserListComponent } from './user-list/user-list.component';
 import { EditNewsComponent } from './edit-news/edit-news.component';
@@ -14,6 +14,9 @@ import { EditUserComponent } from './edit-user/edit-user.component';
 import { CommentListComponent } from './comment-list/comment-list.component';
 import { CommentShowComponent } from './comment-show/comment-show.component';
 import { EditCommentComponent } from './edit-comment/edit-comment.component';
+import { LoginComponent } from './login/login.component';
+import { RegisterComponent } from './register/register.component';
+import { AuthInterceptor } from './auth.interceptor';
 
 @NgModule({
   declarations: [
@@ -26,7 +29,9 @@ import { EditCommentComponent } from './edit-comment/edit-comment.component';
     EditUserComponent,
     CommentListComponent,
     CommentShowComponent,
-    EditCommentComponent
+    EditCommentComponent,
+    LoginComponent,
+    RegisterComponent
   ],
   imports: [
     BrowserModule,
@@ -34,7 +39,13 @@ import { EditCommentComponent } from './edit-comment/edit-comment.component';
     HttpClientModule,
     FormsModule
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

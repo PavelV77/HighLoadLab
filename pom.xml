@@ -16,7 +16,8 @@
 <modules>
 <module>KursNews</module>
 <module>CurseFront</module>
-<module>Gateway</module>
+<module>gateway-service</module>
 <module>discovery-service</module>
+<module>auth-service</module>
 </modules>
 </project>

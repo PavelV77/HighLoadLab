@@ -19,21 +19,19 @@ consumer_thread = None
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Управление жизненным циклом приложения"""
-    # Startup
     global kafka_consumer, consumer_thread
     try:
-        logger.info("🚀 Starting Kafka consumer...")
+        logger.info("Starting Kafka consumer...")
         kafka_consumer = CommentNotificationConsumer()
         consumer_thread = threading.Thread(target=kafka_consumer.start, daemon=True)
         consumer_thread.start()
-        logger.info("✅ Kafka consumer thread started")
+        logger.info("Kafka consumer thread started")
     except Exception as e:
-        logger.error(f"❌ Failed to start Kafka consumer thread: {e}")
-        logger.info("💡 Notification service will continue without Kafka consumer")
+        logger.error(f"Failed to start Kafka consumer thread: {e}")
+        logger.info("Notification service will continue without Kafka consumer")
     
     yield
     
-    # Shutdown
     if kafka_consumer:
         kafka_consumer.stop()
         logger.info("Kafka consumer stopped")
@@ -54,8 +52,8 @@ class NotificationRequest(BaseModel):
     user_id: str
     title: str
     message: str
-    notification_type: Optional[str] = "info"  # info, warning, error, success
-    priority: Optional[str] = "normal"  # low, normal, high, urgent
+    notification_type: Optional[str] = "info"
+    priority: Optional[str] = "normal"
 
 class NotificationResponse(BaseModel):
     id: str
@@ -65,13 +63,12 @@ class NotificationResponse(BaseModel):
     notification_type: str
     priority: str
     created_at: str
-    status: str  # sent, pending, failed
+    status: str
 
 class NotificationStatus(BaseModel):
     status: str
     message: str
 
-# Используем хранилище из kafka_consumer
 notifications_db = get_notifications_db()
 
 @app.get("/")
@@ -158,7 +155,6 @@ async def create_batch_notifications(notifications: List[NotificationRequest]):
     return created_notifications
 
 if __name__ == "__main__":
-    # Жестко заданный порт
     port = 8082
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(app, host="127.0.0.1", port=port)
 

@@ -9,11 +9,8 @@ from email_service import EmailService
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Инициализация email сервиса
 email_service = EmailService()
 
-# Глобальное хранилище уведомлений (можно заменить на БД)
-# Используется как singleton для доступа из main.py
 _notifications_db = []
 
 class CommentNotificationConsumer:
@@ -103,7 +100,7 @@ class CommentNotificationConsumer:
                             consumer_timeout_ms=10000,  # Увеличиваем таймаут
                             api_version=(0, 10, 1)  # Явно указываем версию API
                         )
-                        logger.info(f"✅ Kafka consumer created successfully. Listening to topic: {self.topic}")
+                        logger.info(f"Kafka consumer created successfully. Listening to topic: {self.topic}")
                     except Exception as init_error:
                         # Если не удалось инициализировать, попробуем еще раз
                         if "NoBrokersAvailable" in str(init_error) or "Connection" in str(init_error):
@@ -118,8 +115,8 @@ class CommentNotificationConsumer:
                                 time.sleep(self.retry_delay)
                                 continue
                             else:
-                                logger.error(f"❌ Failed to connect to Kafka after {self.max_retries} attempts: {init_error}")
-                                logger.info("📝 Notification service will continue without Kafka consumer.")
+                                logger.error(f"Failed to connect to Kafka after {self.max_retries} attempts: {init_error}")
+                                logger.info("Notification service will continue without Kafka consumer.")
                                 return
                         else:
                             # Другие ошибки - возможно Kafka еще не готов, но порт доступен
@@ -133,7 +130,7 @@ class CommentNotificationConsumer:
                                 raise init_error
                 
                 # Основной цикл чтения сообщений
-                logger.info("🔄 Starting message consumption loop...")
+                logger.info("Starting message consumption loop...")
                 try:
                     for message in self.consumer:
                         try:
@@ -181,14 +178,14 @@ class CommentNotificationConsumer:
                         continue
                     else:
                         logger.error(
-                            f"❌ Failed to connect to Kafka after {self.max_retries} attempts: {error_msg}"
+                            f"Failed to connect to Kafka after {self.max_retries} attempts: {error_msg}"
                         )
                         logger.info(
-                            f"💡 Please ensure Kafka is running:\n"
+                            f"Please ensure Kafka is running:\n"
                             f"   docker-compose -f docker-compose-kafka.yml up -d\n"
                             f"   Or check if Kafka is available at {self.bootstrap_servers}"
                         )
-                        logger.info("📝 Notification service will continue without Kafka consumer.")
+                        logger.info("Notification service will continue without Kafka consumer.")
                         return
                 else:
                     logger.error(f"Unexpected error in Kafka consumer: {e}", exc_info=True)
@@ -202,7 +199,7 @@ class CommentNotificationConsumer:
     
     def process_message(self, event_data):
         """Обработать сообщение из Kafka"""
-        logger.info(f"📨 Received comment notification event: {event_data}")
+        logger.info(f"Received comment notification event: {event_data}")
         logger.info(f"   Event keys: {list(event_data.keys())}")
         
         try:
@@ -234,20 +231,20 @@ class CommentNotificationConsumer:
             
             # Отправить email уведомление
             user_email = event_data.get('userEmail')  # Email автора новости
-            logger.info(f"📧 Email from event: {user_email} for user {news_author_id}")
+            logger.info(f"Email from event: {user_email} for user {news_author_id}")
             
             if user_email and user_email.strip():
                 # Проверить, что это похоже на email (содержит @)
                 if '@' not in user_email:
                     logger.warning(
-                        f"⚠️ userEmail '{user_email}' doesn't look like a valid email address. "
+                        f"userEmail '{user_email}' doesn't look like a valid email address. "
                         f"Email notification skipped. (Login is used as email, but it's not an email format)"
                     )
                 else:
                     # Запустить async функцию в отдельном потоке с улучшенным логированием
                     def run_async_email():
                         try:
-                            logger.info(f"🔄 Email thread started for {user_email}")
+                            logger.info(f"Email thread started for {user_email}")
                             # Всегда создаем новый event loop для email потока
                             # Это проще и надежнее, чем использовать существующий loop
                             logger.info("Creating new event loop for email sending")
@@ -265,25 +262,25 @@ class CommentNotificationConsumer:
                                     )
                                 )
                                 if result:
-                                    logger.info(f"✅ Email sending completed successfully for {user_email}")
+                                    logger.info(f"Email sending completed successfully for {user_email}")
                                 else:
-                                    logger.warning(f"⚠️ Email sending returned False for {user_email}")
+                                    logger.warning(f"Email sending returned False for {user_email}")
                             except Exception as e:
-                                logger.error(f"❌ Exception in email sending for {user_email}: {e}", exc_info=True)
+                                logger.error(f"Exception in email sending for {user_email}: {e}", exc_info=True)
                             finally:
                                 logger.info(f"Closing event loop for {user_email}")
                                 new_loop.close()
                         except Exception as e:
-                            logger.error(f"❌ Error in email thread for {user_email}: {e}", exc_info=True)
+                            logger.error(f"Error in email thread for {user_email}: {e}", exc_info=True)
                     
                     # Запустить в отдельном потоке
-                    logger.info(f"📤 Starting email thread for {user_email}...")
+                    logger.info(f"Starting email thread for {user_email}...")
                     email_thread = threading.Thread(target=run_async_email, daemon=True, name=f"EmailThread-{user_email}")
                     email_thread.start()
                     logger.debug(f"Email thread started: {email_thread.name}")
             else:
                 logger.warning(
-                    f"⚠️ Email not provided or empty for user {news_author_id}. "
+                    f"Email not provided or empty for user {news_author_id}. "
                     f"Email notification skipped. userEmail value: '{user_email}'"
                 )
             
@@ -299,7 +296,7 @@ class CommentNotificationConsumer:
         comment_body: str
     ):
         """Отправить email уведомление"""
-        logger.info(f"📬 Starting email sending process for {user_email}")
+        logger.info(f"Starting email sending process for {user_email}")
         try:
             # Создать HTML версию письма
             logger.debug(f"Creating HTML email body for {user_email}")
@@ -309,7 +306,7 @@ class CommentNotificationConsumer:
             )
             
             # Отправить email
-            logger.info(f"📤 Calling email_service.send_email for {user_email}")
+            logger.info(f"Calling email_service.send_email for {user_email}")
             success = await email_service.send_email(
                 to_email=user_email,
                 subject=title,
@@ -318,13 +315,13 @@ class CommentNotificationConsumer:
             )
             
             if success:
-                logger.info(f"✅ Email notification sent successfully to {user_email}")
+                logger.info(f"Email notification sent successfully to {user_email}")
             else:
-                logger.warning(f"⚠️ Email service returned False for {user_email} - email may not have been sent")
+                logger.warning(f"Email service returned False for {user_email} - email may not have been sent")
                 
         except Exception as e:
-            logger.error(f"❌ Error sending email notification to {user_email}: {e}", exc_info=True)
-            raise  # Перебросить исключение для обработки в вызывающем коде
+            logger.error(f"Error sending email notification to {user_email}: {e}", exc_info=True)
+            raise
     
     def stop(self):
         """Остановить consumer"""

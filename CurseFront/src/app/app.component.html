@@ -20,8 +20,19 @@
           <li><a href="#" class="nav-link px-2 text-white" [routerLink]="['/users']">Пользователи</a></li>
         </ul>
 
+        <div class="text-end">
+          <div *ngIf="isAuthenticated$ | async; else notAuthenticated">
+            <span class="text-white me-3">Привет, {{ (currentUser$ | async)?.login }}!</span>
+            <button type="button" class="btn btn-outline-light me-2" (click)="logout()">Выйти</button>
+          </div>
+          <ng-template #notAuthenticated>
+            <button type="button" class="btn btn-outline-light me-2" [routerLink]="['/auth/login']">Войти</button>
+            <button type="button" class="btn btn-warning" [routerLink]="['/auth/register']">Регистрация</button>
+          </ng-template>
+        </div>
+
       </div>
     </div>
   </header>
 </main>
-<router-outlet />
+<router-outlet></router-outlet>
