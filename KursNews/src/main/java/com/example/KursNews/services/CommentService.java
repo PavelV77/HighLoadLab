@@ -38,13 +38,11 @@ public class CommentService {
     public CommentDto createComment(UUID newsId, CommentDto commentDto) {
         commentDto.setNewsId(newsId);
         
-        // Получить News и User для установки связей
         News news = newsRepository.findById(newsId)
             .orElseThrow(() -> new RuntimeException("News not found: " + newsId));
         User user = userRepository.findById(commentDto.getUserId())
             .orElseThrow(() -> new RuntimeException("User not found: " + commentDto.getUserId()));
         
-        // Создать Comment с установленными связями
         Comment comment = modelMapper.map(commentDto, Comment.class);
         comment.setNews(news);
         comment.setUser(user);
@@ -52,7 +50,6 @@ public class CommentService {
         Comment savedComment = repository.save(comment);
         CommentDto savedCommentDto = modelMapper.map(savedComment, CommentDto.class);
         
-        // Отправка события в Kafka для уведомления автора новости
         sendCommentNotificationEvent(newsId, savedCommentDto);
         
         return savedCommentDto;
@@ -63,24 +60,21 @@ public class CommentService {
             News news = newsRepository.findById(newsId).orElse(null);
             if (news != null && news.getUser() != null) {
                 User newsAuthor = news.getUser();
-                // Используем login как email, если email не задан отдельно
-                // В будущем можно добавить отдельное поле email в User
-                String userEmail = newsAuthor.getLogin();  // Временное решение
+                String userEmail = newsAuthor.getLogin();
                 log.info("Send notification to {}", userEmail);
                 CommentNotificationEvent event = new CommentNotificationEvent(
                     commentDto.getId(),
                     newsId,
-                    newsAuthor.getId(),  // ID автора новости (кому отправлять уведомление)
-                    commentDto.getUserId(),  // ID автора комментария
+                    newsAuthor.getId(),
+                    commentDto.getUserId(),
                     commentDto.getBody(),
                     news.getHead() != null ? news.getHead() : "Новость",
-                    userEmail,  // Email автора новости
+                    userEmail,
                     System.currentTimeMillis()
                 );
                 kafkaProducerService.sendCommentNotification(event);
             }
         } catch (Exception e) {
-            // Логируем ошибку, но не прерываем создание комментария
             System.err.println("Failed to send comment notification to Kafka: " + e.getMessage());
         }
     }

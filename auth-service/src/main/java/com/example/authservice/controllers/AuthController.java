@@ -21,7 +21,6 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
-            // Валидация входных данных
             if (request.getLogin() == null || request.getLogin().trim().isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Login is required");
@@ -57,8 +56,6 @@ public class AuthController {
             }
             
             String token = authHeader.substring(7);
-            // Валидация токена происходит через JwtUtil
-            // Здесь можно добавить дополнительную логику
             
             return ResponseEntity.ok().build();
         } catch (Exception e) {

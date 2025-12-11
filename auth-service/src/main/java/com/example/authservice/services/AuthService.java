@@ -31,7 +31,6 @@ public class AuthService {
     
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        // Проверка существования пользователя
         if (userRepository.existsByLogin(request.getLogin())) {
             throw new RuntimeException("User with login " + request.getLogin() + " already exists");
         }
@@ -42,11 +41,9 @@ public class AuthService {
             }
         }
         
-        // Создание нового пользователя
         User user = new User();
         user.setLogin(request.getLogin().trim());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        // Устанавливаем email только если он не пустой
         if (request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
             user.setEmail(request.getEmail().trim());
         } else {
@@ -55,20 +52,15 @@ public class AuthService {
         
         User savedUser = userRepository.save(user);
         
-        // Создание пользователя в KursNews service
         try {
             System.out.println("Attempting to create user in KursNews: userId=" + savedUser.getId() + ", login=" + savedUser.getLogin());
             userServiceClient.createUserInKursNews(savedUser.getId(), savedUser.getLogin());
             System.out.println("Successfully created user in KursNews");
         } catch (Exception e) {
-            // Логируем ошибку подробно
             System.err.println("Failed to create user in KursNews service: " + e.getMessage());
             e.printStackTrace();
-            // Можно также откатить транзакцию, если требуется строгая согласованность
-            // throw new RuntimeException("Failed to create user in KursNews service", e);
         }
         
-        // Генерация JWT токена
         String token = jwtUtil.generateToken(savedUser.getId(), savedUser.getLogin());
         
         return new AuthResponse(
@@ -84,12 +76,10 @@ public class AuthService {
         User user = userRepository.findByLogin(request.getLogin())
             .orElseThrow(() -> new RuntimeException("Invalid login or password"));
         
-        // Проверка пароля
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid login or password");
         }
         
-        // Генерация JWT токена
         String token = jwtUtil.generateToken(user.getId(), user.getLogin());
         
         return new AuthResponse(

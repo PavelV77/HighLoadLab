@@ -12,7 +12,6 @@ from kafka_consumer import CommentNotificationConsumer, get_notifications_db
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Запуск Kafka Consumer в фоновом потоке
 kafka_consumer = None
 consumer_thread = None
 

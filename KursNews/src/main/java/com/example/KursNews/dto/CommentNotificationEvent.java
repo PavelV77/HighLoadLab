@@ -12,11 +12,11 @@ import java.util.UUID;
 public class CommentNotificationEvent {
     private UUID commentId;
     private UUID newsId;
-    private UUID newsAuthorId;  // ID автора новости (кому отправлять уведомление)
-    private UUID commentAuthorId;  // ID автора комментария
+    private UUID newsAuthorId;
+    private UUID commentAuthorId;
     private String commentBody;
     private String newsTitle;
-    private String userEmail;  // Email автора новости для отправки уведомления
+    private String userEmail;
     private long timestamp;
 }
 
